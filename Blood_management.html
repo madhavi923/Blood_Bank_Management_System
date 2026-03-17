@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeFlow — Blood Bank Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--red:#C41E3A;--red-dark:#8B0000;--red-light:#FFF0F0;--red-mid:#FCCDD3;
+--green:#157347;--green-light:#EDFAF3;--green-mid:#A8DFC3;
+--amber:#92600A;--amber-light:#FFF8E6;--amber-mid:#FCD34D;
+--blue:#1A4D8F;--blue-light:#EBF2FF;--blue-mid:#93C5FD;
+--purple:#6D28D9;--purple-light:#F5F3FF;
+--bg:#F9FAFB;--surface:#FFFFFF;--border:#E5E7EB;--border2:#D1D5DB;
+--text:#111827;--text2:#4B5563;--text3:#9CA3AF;
+--r:10px;--rl:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+.screen{display:none;}.screen.active{display:block;}
+.psec{display:none;}.psec.on{display:block;}
+ 
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .18s;white-space:nowrap;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:var(--red-dark);transform:translateY(-1px);}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#0d5c39;}
+.btn-blue{background:var(--blue);color:#fff;}.btn-blue:hover{background:#122f5c;}
+.btn-out{background:var(--surface);color:var(--text2);border:1.5px solid var(--border2);}.btn-out:hover{border-color:var(--red);color:var(--red);}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border);padding:7px 14px;font-size:13px;}.btn-ghost:hover{border-color:var(--text2);color:var(--text);}
+.btn-danger-out{background:transparent;color:var(--red);border:1.5px solid var(--red-mid);font-size:13px;padding:7px 14px;}.btn-danger-out:hover{background:var(--red-light);}
+.btn-lg{padding:14px 32px;font-size:16px;}.btn-full{width:100%;}.btn-sm{padding:7px 14px;font-size:12px;}
+ 
+/* FORM */
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--surface);transition:border-color .15s;-webkit-appearance:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(196,30,58,.08);}
+.fg textarea{resize:vertical;min-height:80px;}
+.fg .hint{font-size:11px;color:var(--text3);margin-top:4px;}
+.gr2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.gr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.fdiv{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:22px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.err{background:var(--red-light);border:1px solid var(--red-mid);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red-dark);margin-bottom:14px;display:none;}
+.succ{background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--green);display:none;margin-top:12px;font-weight:500;}
+ 
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.br{background:var(--red-light);color:var(--red-dark);}
+.bg{background:var(--green-light);color:var(--green);}
+.ba{background:var(--amber-light);color:var(--amber);}
+.bb{background:var(--blue-light);color:var(--blue);}
+.bp{background:var(--purple-light);color:var(--purple);}
+.blood-tag{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:26px;padding:0 8px;background:var(--red-light);color:var(--red-dark);border-radius:6px;font-size:13px;font-weight:700;}
+ 
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;}
+.card-hd{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.ct{font-size:15px;font-weight:600;color:var(--text);}
+.cs{font-size:12px;color:var(--text3);margin-top:2px;}
+.cb{padding:20px 22px;}
+.cf{padding:0;}
+ 
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);text-align:left;}
+.tbl td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover td{background:var(--bg);}
+ 
+/* INFO LIST */
+.il .ii{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);gap:14px;}
+.il .ii:last-child{border-bottom:none;padding-bottom:0;}
+.il .ilb{font-size:13px;color:var(--text3);flex-shrink:0;min-width:170px;}
+.il .ilv{font-size:13px;color:var(--text);font-weight:500;text-align:right;}
+ 
+/* STAT ROW */
+.srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+.sbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;position:relative;overflow:hidden;}
+.sbox::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.sbr::after{background:var(--red);}.sbg::after{background:var(--green);}.sba::after{background:#F59E0B;}.sbb::after{background:var(--blue);}.sbp::after{background:var(--purple);}
+.slbl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:var(--text3);margin-bottom:8px;}
+.sval{font-size:28px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif;line-height:1;}
+ 
+/* ALERTS */
+.alert{border-radius:var(--r);padding:13px 16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;border:1px solid;}
+.alert.danger{background:var(--red-light);border-color:var(--red-mid);}
+.alert.warn{background:var(--amber-light);border-color:var(--amber-mid);}
+.alert.info{background:var(--blue-light);border-color:var(--blue-mid);}
+.aldot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.alert.danger .aldot{background:var(--red);}.alert.warn .aldot{background:#F59E0B;}.alert.info .aldot{background:var(--blue);}
+.alert p{font-size:13px;}
+.alert.danger p{color:var(--red-dark);}.alert.warn p{color:var(--amber);}.alert.info p{color:var(--blue);}
+ 
+/* NOTIF */
+.notif{background:var(--surface);border:1.5px solid var(--red-mid);border-radius:var(--rl);padding:22px;margin-bottom:22px;position:relative;overflow:hidden;}
+.notif::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red);}
+.npill{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pdot{width:7px;height:7px;border-radius:50%;background:white;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.ntitle{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.nbody{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;}
+.nbtns{display:flex;gap:10px;align-items:center;}
+.nok{background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:11px 14px;font-size:13px;color:var(--green);display:none;font-weight:600;}
+ 
+/* INV GRID */
+.invgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.invtile{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:18px 12px;text-align:center;}
+.invtype{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--red);margin-bottom:2px;}
+.invunits{font-size:13px;color:var(--text3);margin-bottom:8px;}
+.invbar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px;}
+.invfill{height:100%;border-radius:3px;}
+ 
+/* REPORTS */
+.rptgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.rpttile{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .18s;display:flex;align-items:flex-start;gap:14px;}
+.rpttile:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,.07);transform:translateY(-2px);}
+.rptico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rpttile h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.rpttile p{font-size:12px;color:var(--text3);line-height:1.5;}
+.rptview{display:none;}.rptview.on{display:block;}
+.rpthd{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+ 
+/* REQ ROW */
+.rr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);gap:14px;transition:opacity .3s,transform .3s;}
+.rr:last-child{border-bottom:none;}
+.rri{display:flex;align-items:center;gap:12px;}
+.rrav{width:40px;height:40px;border-radius:50%;background:var(--red-light);color:var(--red);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rrname{font-size:14px;font-weight:600;color:var(--text);}
+.rrmeta{font-size:12px;color:var(--text3);margin-top:2px;}
+.rract{display:flex;gap:8px;}
+ 
+/* CAMP CARDS */
+.camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.camp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;transition:box-shadow .18s;}
+.camp-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.camp-top{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.camp-org{font-size:14px;font-weight:700;color:var(--text);}
+.camp-body{padding:14px 18px;}
+.camp-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13px;color:var(--text2);}
+.camp-row:last-child{margin-bottom:0;}
+.camp-ico{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--text3);}
+.camp-action{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;}
+ 
+/* RECEIVER REQUEST FORM */
+.req-form-card{background:var(--surface);border:1.5px solid var(--blue-mid);border-radius:var(--rl);padding:24px;margin-bottom:20px;position:relative;overflow:hidden;}
+.req-form-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);}
+ 
+/* ROLE TABS (dual role toggle) */
+.role-toggle{display:flex;gap:0;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:24px;}
+.rt{flex:1;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text3);font-family:'Outfit',sans-serif;transition:all .15s;text-align:center;}
+.rt.on{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+ 
+/* EMPTY */
+.empty-s{padding:40px 20px;text-align:center;}
+.empty-s p{font-size:14px;color:var(--text3);}
+ 
+/* ══ LANDING ══ */
+#s-role{min-height:100vh;background:var(--surface);}
+.lnav{padding:0 48px;height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;}
+.lm{width:34px;height:34px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.lm svg{width:18px;height:18px;}
+.ln{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);}
+.ln span{color:var(--red);}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 68px);max-width:1100px;margin:0 auto;padding:60px 48px;gap:60px;align-items:center;}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--red-light);color:var(--red);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-bottom:20px;text-transform:uppercase;letter-spacing:.5px;}
+.edot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.htitle{font-family:'Playfair Display',serif;font-size:46px;line-height:1.15;color:var(--text);margin-bottom:16px;font-weight:700;}
+.htitle span{color:var(--red);}
+.hdesc{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:32px;font-weight:300;max-width:440px;}
+.hctas{display:flex;gap:12px;align-items:center;margin-bottom:40px;}
+.hstats{display:flex;gap:32px;padding-top:32px;border-top:1px solid var(--border);}
+.hsnum{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--red);}
+.hslbl{font-size:12px;color:var(--text3);margin-top:2px;}
+.hroles{display:flex;flex-direction:column;gap:14px;}
+.rp{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.rp::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;opacity:0;transition:opacity .2s;}
+.rp-d::before{background:var(--red);}.rp-r::before{background:var(--blue);}.rp-a::before{background:var(--green);}
+.rp:hover{border-color:transparent;box-shadow:0 4px 24px rgba(0,0,0,.10);transform:translateY(-2px);}
+.rp:hover::before{opacity:1;}
+.rpic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rp-d .rpic{background:var(--red-light);}.rp-r .rpic{background:var(--blue-light);}.rp-a .rpic{background:var(--green-light);}
+.rpname{font-size:16px;font-weight:700;color:var(--text);}
+.rpdesc{font-size:12px;color:var(--text2);line-height:1.5;margin-top:6px;}
+.rpfeats{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;}
+.rpfeat{font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 9px;}
+.rparrow{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.rp-d .rparrow{background:var(--red-light);color:var(--red);}
+.rp-r .rparrow{background:var(--blue-light);color:var(--blue);}
+.rp-a .rparrow{background:var(--green-light);color:var(--green);}
+.infostrip{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.isitem{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text3);}
+.isdot{width:7px;height:7px;border-radius:50%;}
+ 
+/* ══ AUTH ══ */
+.awrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.al{padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+.al.red{background:var(--red);}.al.green{background:var(--green);}.al.blue{background:var(--blue);}
+.al::before{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.06);top:-100px;left:-100px;}
+.al::after{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-80px;right:-60px;}
+.allogo{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
+.allm{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.allm svg{width:19px;height:19px;}
+.alname{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:white;}
+.alcontent{position:relative;z-index:1;}
+.altitle{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:white;line-height:1.2;margin-bottom:12px;}
+.aldesc{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;font-weight:300;}
+.alfacts{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;margin-top:36px;}
+.afact{display:flex;align-items:center;gap:10px;}
+.afactico{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.afacttxt{font-size:13px;color:rgba(255,255,255,.8);}
+.alfoot{font-size:12px;color:rgba(255,255,255,.5);position:relative;z-index:1;}
+.ar{background:var(--surface);display:flex;align-items:center;justify-content:center;padding:48px;overflow-y:auto;}
+.ar.top{align-items:flex-start;padding-top:36px;padding-bottom:36px;}
+.abox{width:100%;max-width:420px;}
+.aboxw{width:100%;max-width:500px;}
+.aback{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text3);cursor:pointer;margin-bottom:28px;transition:color .15s;background:none;border:none;font-family:'Outfit',sans-serif;padding:0;}
+.aback:hover{color:var(--red);}
+.atitle{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.asub{font-size:14px;color:var(--text3);margin-bottom:28px;font-weight:300;}
+.aswitch{font-size:13px;color:var(--text3);margin-top:16px;text-align:center;}
+.aswitch a{color:var(--red);cursor:pointer;font-weight:600;}
+ 
+/* ══ APP BAR ══ */
+.appbar{height:62px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.ableft{display:flex;align-items:center;gap:24px;}
+.applogo{display:flex;align-items:center;gap:8px;}
+.applm{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.applm svg{width:15px;height:15px;}
+.appln{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);}
+.tabs{display:flex;}
+.tab{padding:0 16px;height:62px;display:flex;align-items:center;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;border-top:none;border-left:none;border-right:none;transition:all .15s;font-weight:500;background:none;font-family:'Outfit',sans-serif;white-space:nowrap;}
+.tab:hover{color:var(--text);}
+.tab.on{color:var(--red);border-bottom-color:var(--red);}
+.abright{display:flex;align-items:center;gap:10px;}
+.uchip{display:flex;align-items:center;gap:7px;padding:3px 10px 3px 3px;border:1px solid var(--border);border-radius:20px;}
+.uav{width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.uname{font-size:13px;font-weight:500;color:var(--text);}
+.acontent{max-width:1000px;margin:0 auto;padding:28px 26px;}
+.ph{margin-bottom:24px;}
+.ph h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ph p{font-size:13px;color:var(--text3);font-weight:300;}
+</style>
+</head>
+<body>
+ 
+<!-- ══════════════════════════════════════════
+LANDING — ROLE SELECTION
+══════════════════════════════════════════ -->
+<div class="screen active" id="s-role">
+<nav class="lnav">
+<div class="logo"><div class="lm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="ln">Life<span>Flow</span></div></div>
+<div style="display:flex;align-items:center;gap:8px;">
+<button class="btn btn-ghost btn-sm" onclick="goTo('s-camp-public')">Donation Camps</button>
+<button class="btn btn-out btn-sm">About</button>
+<button class="btn btn-red btn-sm" onclick="goTo('s-donor-login')">Sign In</button>
+</div>
+</nav>
+<div class="hero">
+<div>
+<div class="eyebrow"><div class="edot"></div>India's trusted blood network</div>
+<h1 class="htitle">Give the Gift<br>of <span>Life</span> Today</h1>
+<p class="hdesc">LifeFlow connects blood donors with patients in need. Register as a donor or receiver, track your donations, and get real-time alerts when your blood type is urgently needed.</p>
+<div class="hctas">
+<button class="btn btn-red btn-lg" onclick="goTo('s-donor-register')">Become a Donor</button>
+<button class="btn btn-out btn-lg" onclick="goTo('s-recv-register')">Request Blood</button>
+</div>
+<div class="hstats">
+<div><div class="hsnum">12,400+</div><div class="hslbl">Registered Donors</div></div>
+<div><div class="hsnum">48,000+</div><div class="hslbl">Units Donated</div></div>
+<div><div class="hsnum">120+</div><div class="hslbl">Partner Hospitals</div></div>
+</div>
+</div>
+<div class="hroles">
+<div class="rp rp-d" onclick="goTo('s-donor-login')">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+<div class="rpic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#C41E3A" stroke-width="1.8"/><path d="M3 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="#C41E3A" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></div>
+<div><div class="rpname">Donor Portal</div><div style="font-size:11px;color:var(--text3);">Donate blood · Track history</div></div>
+</div>
+<p class="rpdesc">Respond to urgent requests, view your donation history and manage your health profile.</p>
+<div class="rpfeats"><span class="rpfeat">Donation history</span><span class="rpfeat">Urgent alerts</span><span class="rpfeat">Health profile</span></div>
+<div class="rparrow">→</div>
+</div>
+<div class="rp rp-r" onclick="goTo('s-recv-login')">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+<div class="rpic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3C11 3 5 9 5 13a6 6 0 0012 0C17 9 11 3 11 3z" stroke="#1A4D8F" stroke-width="1.8" fill="none"/><path d="M8.5 13a2.5 2.5 0 005 0" stroke="#1A4D8F" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
+<div><div class="rpname" style="color:var(--blue);">Receiver Portal</div><div style="font-size:11px;color:var(--text3);">Request blood · Find donors</div></div>
+</div>
+<p class="rpdesc">Submit a blood request for yourself or a patient. We'll match you with eligible donors in your city.</p>
+<div class="rpfeats"><span class="rpfeat">Blood requests</span><span class="rpfeat">City-based matching</span><span class="rpfeat">Request tracking</span></div>
+<div class="rparrow">→</div>
+</div>
+<div class="rp rp-a" onclick="goTo('s-admin-login')">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+<div class="rpic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="12" width="16" height="8" rx="2" stroke="#157347" stroke-width="1.8" fill="none"/><path d="M7 12V8a4 4 0 018 0v4" stroke="#157347" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div>
+<div><div class="rpname" style="color:var(--green);">Admin Portal</div><div style="font-size:11px;color:var(--text3);">Manage · Approve · Report</div></div>
+</div>
+<p class="rpdesc">Blood bank staff portal — manage inventory, approve requests and generate compliance reports.</p>
+<div class="rpfeats"><span class="rpfeat">Inventory</span><span class="rpfeat">Approvals</span><span class="rpfeat">4 reports</span><span class="rpfeat">Donation camps</span></div>
+<div class="rparrow">→</div>
+</div>
+<div class="infostrip">
+<div class="isitem"><div class="isdot" style="background:var(--red);"></div>AB− critically low</div>
+<div class="isitem"><div class="isdot" style="background:#F59E0B;"></div>B− stock low</div>
+<div class="isitem"><div class="isdot" style="background:var(--green);"></div>O+ sufficient</div>
+<div class="isitem"><div class="isdot" style="background:var(--blue);"></div>3 camps this week</div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+PUBLIC DONATION CAMPS PAGE (no login)
+══════════════════════════════════════════ -->
+<div class="screen" id="s-camp-public">
+<div class="appbar">
+<div class="ableft">
+<div class="applogo"><div class="applm" style="background:var(--red);"><svg viewBox="0 0 15 18" fill="none"><path d="M7.5 1C7.5 1 1 7.5 1 12a6.5 6.5 0 0013 0C14 7.5 7.5 1 7.5 1z" fill="white"/></svg></div><div class="appln">LifeFlow</div></div>
+</div>
+<div class="abright">
+<button class="btn btn-out btn-sm" onclick="goTo('s-role')">← Back to Home</button>
+<button class="btn btn-red btn-sm" onclick="goTo('s-donor-login')">Sign In</button>
+</div>
+</div>
+<div class="acontent">
+<div class="ph"><h1>Nearby Donation Camps</h1><p>Find blood donation camps in your city — no login required</p></div>
+<div class="card" style="margin-bottom:20px;">
+<div class="cb">
+<div class="gr3">
+<div class="fg" style="margin:0;"><label>Filter by City</label>
+<select id="pub-city-filter" onchange="filterCamps()">
+<option value="">All Cities</option>
+<option>Nagpur</option><option>Mumbai</option><option>Pune</option><option>Delhi</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Kolkata</option>
+</select>
+</div>
+<div class="fg" style="margin:0;"><label>Blood Group Needed</label>
+<select id="pub-bg-filter" onchange="filterCamps()">
+<option value="">All Groups</option>
+<option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>AB+</option><option>AB−</option>
+</select>
+</div>
+<div class="fg" style="margin:0;"><label>Date</label><select id="pub-date-filter" onchange="filterCamps()"><option value="">Any Date</option><option>This Week</option><option>This Month</option></select></div>
+</div>
+</div>
+</div>
+<div class="camp-grid" id="pub-camps-list"></div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+DONOR LOGIN
+══════════════════════════════════════════ -->
+<div class="screen" id="s-donor-login">
+<div class="awrap">
+<div class="al red">
+<div class="allogo"><div class="allm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="alname">LifeFlow</div></div>
+<div class="alcontent">
+<div class="altitle">Every drop<br>counts.</div>
+<div class="aldesc">Sign in to your donor account and see how you are saving lives.</div>
+<div class="alfacts">
+<div class="afact"><div class="afactico">♥</div><div class="afacttxt">1 donation saves up to 3 lives</div></div>
+<div class="afact"><div class="afactico">⏱</div><div class="afacttxt">Takes only 30–45 minutes</div></div>
+<div class="afact"><div class="afactico">🔄</div><div class="afacttxt">Donate every 90 days</div></div>
+</div>
+</div>
+<div class="alfoot">© 2026 LifeFlow Blood Bank</div>
+</div>
+<div class="ar">
+<div class="abox">
+<button class="aback" onclick="goTo('s-role')">← Back to home</button>
+<div class="atitle">Donor Sign In</div>
+<div class="asub">Sign in to your donor account</div>
+<div id="dl-err" class="err">Incorrect email or password.</div>
+<div class="fg"><label>Email Address</label><input type="email" id="dl-email" placeholder="you@example.com"></div>
+<div class="fg"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••"></div>
+<button class="btn btn-red btn-full" onclick="donorLogin()">Sign In</button>
+<div class="aswitch">No account? <a onclick="goTo('s-donor-register')">Register as donor</a></div>
+<div class="aswitch" style="margin-top:8px;">Are you a receiver? <a onclick="goTo('s-recv-login')">Receiver login →</a></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+DONOR REGISTER
+══════════════════════════════════════════ -->
+<div class="screen" id="s-donor-register">
+<div class="awrap">
+<div class="al red">
+<div class="allogo"><div class="allm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="alname">LifeFlow</div></div>
+<div class="alcontent">
+<div class="altitle">Join our<br>donor network.</div>
+<div class="aldesc">Register as a verified donor. Your information is securely stored and used only for donation coordination.</div>
+<div class="alfacts">
+<div class="afact"><div class="afactico">🛡</div><div class="afacttxt">Data encrypted and secure</div></div>
+<div class="afact"><div class="afactico">📱</div><div class="afacttxt">SMS alerts when your blood is needed</div></div>
+<div class="afact"><div class="afactico">🏆</div><div class="afacttxt">Earn recognition for every donation</div></div>
+</div>
+</div>
+<div class="alfoot">© 2026 LifeFlow Blood Bank</div>
+</div>
+<div class="ar top">
+<div class="aboxw">
+<button class="aback" onclick="goTo('s-donor-login')">← Back to sign in</button>
+<div class="atitle">Create Donor Account</div>
+<div class="asub">Fill all sections to register as a blood donor</div>
+ 
+<div class="fdiv">Personal Information</div>
+<div class="gr2">
+<div class="fg"><label>First Name *</label><input type="text" id="r-fname" placeholder="First name"></div>
+<div class="fg"><label>Last Name *</label><input type="text" id="r-lname" placeholder="Last name"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Date of Birth *</label><input type="date" id="r-dob"></div>
+<div class="fg"><label>Gender *</label><select id="r-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Phone *</label><input type="tel" id="r-phone" placeholder="10-digit mobile"></div>
+<div class="fg"><label>Email *</label><input type="email" id="r-email" placeholder="you@example.com"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>City *</label><select id="r-city"><option value="">Select city</option><option>Nagpur</option><option>Mumbai</option><option>Pune</option><option>Delhi</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Kolkata</option><option>Amravati</option><option>Other</option></select></div>
+<div class="fg"><label>State *</label><select id="r-state"><option value="">Select state</option><option>Maharashtra</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>Rajasthan</option><option>Telangana</option><option>West Bengal</option><option>Other</option></select></div>
+</div>
+<div class="fg"><label>Full Address</label><input type="text" id="r-addr" placeholder="House / Street / Area"></div>
+ 
+<div class="fdiv">Medical Information</div>
+<div class="gr2">
+<div class="fg"><label>Blood Group *</label><select id="r-blood"><option value="">Select</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>AB+</option><option>AB−</option></select></div>
+<div class="fg"><label>Weight (kg) *</label><input type="number" id="r-weight" placeholder="Min. 50 kg" min="50"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Chronic Disease</label><select id="r-disease"><option value="None">None</option><option>Diabetes</option><option>Hypertension</option><option>Heart Disease</option><option>Anemia</option><option>Thyroid</option><option>Other</option></select></div>
+<div class="fg"><label>Last Donation Date</label><input type="date" id="r-lastdon"><div class="hint">Leave blank if first-time donor</div></div>
+</div>
+<div class="fg"><label>Current Medications</label><input type="text" id="r-meds" placeholder="List medications or write 'None'"></div>
+<div class="fg"><label>Allergies</label><input type="text" id="r-allergy" placeholder="List allergies or write 'None'"></div>
+<div class="fg"><label>Additional Health Notes</label><textarea id="r-notes" placeholder="Any other relevant health information..."></textarea></div>
+ 
+<div class="fdiv">Identification & Emergency</div>
+<div class="gr2">
+<div class="fg"><label>Aadhaar Number</label><input type="text" id="r-aadhar" placeholder="12-digit Aadhaar"></div>
+<div class="fg"><label>Emergency Contact</label><input type="tel" id="r-emerg" placeholder="Emergency phone"></div>
+</div>
+ 
+<div class="fdiv">Account Security</div>
+<div class="gr2">
+<div class="fg"><label>Password *</label><input type="password" id="r-pass" placeholder="Min. 8 characters"></div>
+<div class="fg"><label>Confirm Password *</label><input type="password" id="r-cpass" placeholder="Re-enter password"></div>
+</div>
+ 
+<div id="reg-err" class="err"></div>
+<button class="btn btn-red btn-full btn-lg" onclick="registerDonor()">Create Donor Account</button>
+<div id="reg-ok" class="succ">✓ Registration successful! Taking you to your dashboard...</div>
+<div class="aswitch">Already registered? <a onclick="goTo('s-donor-login')">Sign in here</a></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+RECEIVER LOGIN
+══════════════════════════════════════════ -->
+<div class="screen" id="s-recv-login">
+<div class="awrap">
+<div class="al blue">
+<div class="allogo"><div class="allm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="alname">LifeFlow</div></div>
+<div class="alcontent">
+<div class="altitle">Need blood?<br>We're here.</div>
+<div class="aldesc">Register as a receiver to request blood for yourself or a patient. We match you with eligible donors in your city.</div>
+<div class="alfacts">
+<div class="afact"><div class="afactico">📍</div><div class="afacttxt">City-based donor matching</div></div>
+<div class="afact"><div class="afactico">⚡</div><div class="afacttxt">Emergency requests processed in minutes</div></div>
+<div class="afact"><div class="afactico">🏥</div><div class="afacttxt">120+ partner hospitals across India</div></div>
+</div>
+</div>
+<div class="alfoot">© 2026 LifeFlow Blood Bank</div>
+</div>
+<div class="ar">
+<div class="abox">
+<button class="aback" onclick="goTo('s-role')">← Back to home</button>
+<div class="atitle">Receiver Sign In</div>
+<div class="asub">Sign in to request or track blood</div>
+<div id="rl-err" class="err">Incorrect email or password.</div>
+<div class="fg"><label>Email Address</label><input type="email" id="rl-email" placeholder="you@example.com"></div>
+<div class="fg"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••"></div>
+<button class="btn btn-blue btn-full" onclick="recvLogin()">Sign In</button>
+<div class="aswitch">No account? <a onclick="goTo('s-recv-register')">Register as receiver</a></div>
+<div class="aswitch" style="margin-top:8px;">Are you a donor? <a onclick="goTo('s-donor-login')">Donor login →</a></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+RECEIVER REGISTER
+══════════════════════════════════════════ -->
+<div class="screen" id="s-recv-register">
+<div class="awrap">
+<div class="al blue">
+<div class="allogo"><div class="allm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="alname">LifeFlow</div></div>
+<div class="alcontent">
+<div class="altitle">Register as<br>Receiver.</div>
+<div class="aldesc">Provide patient details and your city so we can find the right blood donors near you as quickly as possible.</div>
+<div class="alfacts">
+<div class="afact"><div class="afactico">📍</div><div class="afacttxt">City helps us find donors near you</div></div>
+<div class="afact"><div class="afactico">🩺</div><div class="afacttxt">Medical info helps prioritise requests</div></div>
+<div class="afact"><div class="afactico">🔔</div><div class="afacttxt">Get notified when donors are found</div></div>
+</div>
+</div>
+<div class="alfoot">© 2026 LifeFlow Blood Bank</div>
+</div>
+<div class="ar top">
+<div class="aboxw">
+<button class="aback" onclick="goTo('s-recv-login')">← Back to sign in</button>
+<div class="atitle">Create Receiver Account</div>
+<div class="asub">Patient and contact information for blood requests</div>
+ 
+<div class="fdiv">Personal Information</div>
+<div class="gr2">
+<div class="fg"><label>First Name *</label><input type="text" id="rv-fname" placeholder="First name"></div>
+<div class="fg"><label>Last Name *</label><input type="text" id="rv-lname" placeholder="Last name"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Phone *</label><input type="tel" id="rv-phone" placeholder="10-digit mobile"></div>
+<div class="fg"><label>Email *</label><input type="email" id="rv-email" placeholder="you@example.com"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>City * <span style="color:var(--blue);font-size:10px;">(Used to find nearby donors)</span></label>
+<select id="rv-city"><option value="">Select your city</option><option>Nagpur</option><option>Mumbai</option><option>Pune</option><option>Delhi</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Kolkata</option><option>Amravati</option><option>Other</option></select>
+</div>
+<div class="fg"><label>State *</label><select id="rv-state"><option value="">Select state</option><option>Maharashtra</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>Rajasthan</option><option>Telangana</option><option>West Bengal</option><option>Other</option></select></div>
+</div>
+<div class="fg"><label>Hospital Name (if admitted)</label><input type="text" id="rv-hospital" placeholder="Hospital name or 'Outpatient'"></div>
+ 
+<div class="fdiv">Blood Requirement</div>
+<div class="gr2">
+<div class="fg"><label>Blood Group Required *</label><select id="rv-blood"><option value="">Select</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>AB+</option><option>AB−</option></select></div>
+<div class="fg"><label>Units Required *</label><input type="number" id="rv-units" placeholder="Number of units" min="1" max="20"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Required By Date *</label><input type="date" id="rv-reqdate"></div>
+<div class="fg"><label>Urgency *</label><select id="rv-urgency"><option value="">Select</option><option>Emergency (within 24 hrs)</option><option>Urgent (within 3 days)</option><option>Normal (within a week)</option><option>Scheduled</option></select></div>
+</div>
+<div class="fg"><label>Medical Condition / Purpose *</label><input type="text" id="rv-condition" placeholder="e.g. Surgery, Thalassemia, Accident, Childbirth..."></div>
+<div class="fg"><label>Doctor's Name (if available)</label><input type="text" id="rv-doctor" placeholder="Referring doctor's name"></div>
+ 
+<div class="fdiv">Account Security</div>
+<div class="gr2">
+<div class="fg"><label>Password *</label><input type="password" id="rv-pass" placeholder="Min. 8 characters"></div>
+<div class="fg"><label>Confirm Password *</label><input type="password" id="rv-cpass" placeholder="Re-enter password"></div>
+</div>
+ 
+<div id="rv-err" class="err"></div>
+<button class="btn btn-blue btn-full btn-lg" onclick="registerRecv()">Create Receiver Account</button>
+<div id="rv-ok" class="succ">✓ Account created! Taking you to your dashboard...</div>
+<div class="aswitch">Already registered? <a onclick="goTo('s-recv-login')">Sign in here</a></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+ADMIN LOGIN
+══════════════════════════════════════════ -->
+<div class="screen" id="s-admin-login">
+<div class="awrap">
+<div class="al green">
+<div class="allogo"><div class="allm"><svg viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 1 9 1 14.5a8 8 0 0016 0C17 9 9 1 9 1z" fill="white"/></svg></div><div class="alname">LifeFlow Admin</div></div>
+<div class="alcontent">
+<div class="altitle">Blood Bank<br>Management.</div>
+<div class="aldesc">Secure staff portal to manage donations, receivers, inventory, camps and reports.</div>
+<div class="alfacts">
+<div class="afact"><div class="afactico">📦</div><div class="afacttxt">Real-time blood inventory management</div></div>
+<div class="afact"><div class="afactico">✅</div><div class="afacttxt">Approve donor & receiver requests</div></div>
+<div class="afact"><div class="afactico">⛺</div><div class="afacttxt">Manage blood donation camps</div></div>
+</div>
+</div>
+<div class="alfoot">Authorised personnel only. Access is logged.</div>
+</div>
+<div class="ar">
+<div class="abox">
+<button class="aback" onclick="goTo('s-role')">← Back</button>
+<div class="atitle">Admin Sign In</div>
+<div class="asub">Enter your staff credentials</div>
+<div id="al-err" class="err">Invalid credentials.</div>
+<div class="fg"><label>Staff ID / Email</label><input type="text" id="al-id" placeholder="staff@lifeflow.in"></div>
+<div class="fg"><label>Password</label><input type="password" id="al-pass" placeholder="••••••••"></div>
+<button class="btn btn-green btn-full btn-lg" onclick="adminLogin()">Sign In to Admin Panel</button>
+<div class="aswitch"><a onclick="goTo('s-role')">← Return to main site</a></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+DONOR DASHBOARD
+══════════════════════════════════════════ -->
+<div class="screen" id="s-donor-dash">
+<div class="appbar">
+<div class="ableft">
+<div class="applogo"><div class="applm" style="background:var(--red);"><svg viewBox="0 0 15 18" fill="none"><path d="M7.5 1C7.5 1 1 7.5 1 12a6.5 6.5 0 0013 0C14 7.5 7.5 1 7.5 1z" fill="white"/></svg></div><div class="appln">LifeFlow</div></div>
+<div class="tabs" id="dtabs">
+<button class="tab on" onclick="dTab('dh',0)">Dashboard</button>
+<button class="tab" onclick="dTab('dprof',1)">My Profile</button>
+<button class="tab" onclick="dTab('dhist',2)">Donation History</button>
+<button class="tab" onclick="dTab('dcamps',3)">Nearby Camps</button>
+</div>
+</div>
+<div class="abright">
+<div class="uchip"><div class="uav" id="d-av" style="background:var(--red-light);color:var(--red);">?</div><div class="uname" id="d-uname">Donor</div></div>
+<button class="btn btn-ghost btn-sm" onclick="goTo('s-role')">Sign Out</button>
+</div>
+</div>
+<div class="acontent">
+ 
+<div class="psec on" id="dh">
+<div class="notif" id="d-notif">
+<div class="npill"><div class="pdot"></div>Urgent Request</div>
+<div class="ntitle">Your blood type is urgently needed — <span id="n-bg" style="color:var(--red);">—</span></div>
+<div class="nbody">LifeFlow <span id="n-city">Nagpur</span> Blood Bank urgently requires <strong id="n-bg2">—</strong> blood. You are eligible to donate today. One unit saves up to 3 lives.</div>
+<div id="n-btns" class="nbtns">
+<button class="btn btn-red" onclick="applyDonate()">Yes, I want to donate</button>
+<button class="btn btn-out" onclick="document.getElementById('d-notif').style.display='none'">Maybe later</button>
+</div>
+<div id="n-ok" class="nok">✓ Application submitted. The blood bank admin will confirm your appointment shortly.</div>
+</div>
+<div class="srow">
+<div class="sbox sbr"><div class="slbl">Total Donations</div><div class="sval" id="d-sc">0</div></div>
+<div class="sbox sbg"><div class="slbl">Blood Group</div><div class="sval" id="d-sbg" style="color:var(--red);">—</div></div>
+<div class="sbox sba"><div class="slbl">Lives Impacted</div><div class="sval" id="d-slives" style="color:var(--green);">0</div></div>
+<div class="sbox sbb"><div class="slbl">Next Eligible</div><div class="sval" id="d-snext" style="font-size:15px;padding-top:6px;">—</div></div>
+</div>
+<div class="card">
+<div class="card-hd"><div><div class="ct">Account Summary</div><div class="cs">Your registered information</div></div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Full Name</span><span class="ilv" id="ds-name">—</span></div>
+<div class="ii"><span class="ilb">Blood Group</span><span class="ilv"><span class="blood-tag" id="ds-bg">—</span></span></div>
+<div class="ii"><span class="ilb">City</span><span class="ilv" id="ds-city">—</span></div>
+<div class="ii"><span class="ilb">Phone</span><span class="ilv" id="ds-phone">—</span></div>
+<div class="ii"><span class="ilb">Donor Status</span><span class="ilv"><span class="badge bg">Active & Eligible</span></span></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="dprof">
+<div class="ph"><h1>My Profile</h1><p>Your complete personal and medical information on record</p></div>
+<div class="card">
+<div class="card-hd"><div class="ct">Personal Details</div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Full Name</span><span class="ilv" id="pp-name">—</span></div>
+<div class="ii"><span class="ilb">Date of Birth</span><span class="ilv" id="pp-dob">—</span></div>
+<div class="ii"><span class="ilb">Gender</span><span class="ilv" id="pp-gender">—</span></div>
+<div class="ii"><span class="ilb">Phone</span><span class="ilv" id="pp-phone">—</span></div>
+<div class="ii"><span class="ilb">Email</span><span class="ilv" id="pp-email">—</span></div>
+<div class="ii"><span class="ilb">City, State</span><span class="ilv" id="pp-loc">—</span></div>
+<div class="ii"><span class="ilb">Address</span><span class="ilv" id="pp-addr">—</span></div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-hd"><div class="ct">Medical Information</div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Blood Group</span><span class="ilv"><span class="blood-tag" id="pp-bg">—</span></span></div>
+<div class="ii"><span class="ilb">Weight</span><span class="ilv" id="pp-weight">—</span></div>
+<div class="ii"><span class="ilb">Chronic Disease</span><span class="ilv" id="pp-disease">—</span></div>
+<div class="ii"><span class="ilb">Current Medications</span><span class="ilv" id="pp-meds">—</span></div>
+<div class="ii"><span class="ilb">Allergies</span><span class="ilv" id="pp-allergy">—</span></div>
+<div class="ii"><span class="ilb">Last Donation Date</span><span class="ilv" id="pp-lastdon">—</span></div>
+<div class="ii"><span class="ilb">Health Notes</span><span class="ilv" id="pp-notes">—</span></div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-hd"><div class="ct">Identification & Emergency</div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Aadhaar Number</span><span class="ilv" id="pp-aadhar">—</span></div>
+<div class="ii"><span class="ilb">Emergency Contact</span><span class="ilv" id="pp-emerg">—</span></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="dhist">
+<div class="ph"><h1>Donation History</h1><p>All your past blood donations on record</p></div>
+<div class="card">
+<div class="cf">
+<table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Blood Bank</th><th>Blood Group</th><th>Units</th><th>Status</th></tr></thead>
+<tbody id="dhist-body"><tr><td colspan="6"><div class="empty-s"><p>No donation history yet. Records will appear here after your first donation.</p></div></td></tr></tbody></table>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="dcamps">
+<div class="ph"><h1>Nearby Donation Camps</h1><p>Blood donation camps near <strong id="d-camp-city">your city</strong></p></div>
+<div class="alert info" style="margin-bottom:20px;"><div class="aldot"></div><p>Showing camps in and around <strong id="d-camp-city2">your city</strong>. You can register at any camp — walk-ins also welcome.</p></div>
+<div class="camp-grid" id="d-camps-list"></div>
+</div>
+ 
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+RECEIVER DASHBOARD
+══════════════════════════════════════════ -->
+<div class="screen" id="s-recv-dash">
+<div class="appbar">
+<div class="ableft">
+<div class="applogo"><div class="applm" style="background:var(--blue);"><svg viewBox="0 0 15 18" fill="none"><path d="M7.5 1C7.5 1 1 7.5 1 12a6.5 6.5 0 0013 0C14 7.5 7.5 1 7.5 1z" fill="white"/></svg></div><div class="appln">LifeFlow</div></div>
+<div class="tabs" id="rtabs">
+<button class="tab on" onclick="rTab('rh',0)">Dashboard</button>
+<button class="tab" onclick="rTab('rrprof',1)">My Profile</button>
+<button class="tab" onclick="rTab('rreq',2)">My Requests</button>
+<button class="tab" onclick="rTab('rnewreq',3)">New Blood Request</button>
+<button class="tab" onclick="rTab('rcamps',4)">Nearby Camps</button>
+</div>
+</div>
+<div class="abright">
+<div class="uchip"><div class="uav" id="r-av" style="background:var(--blue-light);color:var(--blue);">?</div><div class="uname" id="r-uname">Receiver</div></div>
+<button class="btn btn-ghost btn-sm" onclick="goTo('s-role')">Sign Out</button>
+</div>
+</div>
+<div class="acontent">
+ 
+<div class="psec on" id="rh">
+<div class="srow">
+<div class="sbox sbb"><div class="slbl">Total Requests</div><div class="sval" id="rv-sreq">1</div></div>
+<div class="sbox sbr"><div class="slbl">Blood Required</div><div class="sval" id="rv-sbg" style="color:var(--red);">—</div></div>
+<div class="sbox sba"><div class="slbl">City</div><div class="sval" id="rv-scity" style="font-size:16px;padding-top:6px;">—</div></div>
+<div class="sbox sbg"><div class="slbl">Request Status</div><div class="sval" id="rv-sstatus" style="font-size:15px;padding-top:6px;">—</div></div>
+</div>
+<div class="alert info" style="margin-bottom:20px;"><div class="aldot"></div><p>Your blood request has been submitted. Our team is matching you with eligible donors in <strong id="rv-city-info">your city</strong>. You will be contacted shortly.</p></div>
+<div class="card">
+<div class="card-hd"><div><div class="ct">Request Summary</div><div class="cs">Your current blood request details</div></div><button class="btn btn-blue btn-sm" onclick="rTab('rnewreq',3)">+ New Request</button></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Receiver Name</span><span class="ilv" id="rv-rname">—</span></div>
+<div class="ii"><span class="ilb">Blood Group Needed</span><span class="ilv"><span class="blood-tag" id="rv-rbg">—</span></span></div>
+<div class="ii"><span class="ilb">Units Required</span><span class="ilv" id="rv-runits">—</span></div>
+<div class="ii"><span class="ilb">City</span><span class="ilv" id="rv-rcity">—</span></div>
+<div class="ii"><span class="ilb">Hospital</span><span class="ilv" id="rv-rhosp">—</span></div>
+<div class="ii"><span class="ilb">Required By</span><span class="ilv" id="rv-rdate">—</span></div>
+<div class="ii"><span class="ilb">Urgency</span><span class="ilv" id="rv-rurgency">—</span></div>
+<div class="ii"><span class="ilb">Condition</span><span class="ilv" id="rv-rcond">—</span></div>
+<div class="ii"><span class="ilb">Status</span><span class="ilv"><span class="badge bb" id="rv-rstatus-badge">Pending Review</span></span></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="rrprof">
+<div class="ph"><h1>My Profile</h1><p>Your registered contact and patient information</p></div>
+<div class="card">
+<div class="card-hd"><div class="ct">Contact Information</div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Full Name</span><span class="ilv" id="rp-name">—</span></div>
+<div class="ii"><span class="ilb">Phone</span><span class="ilv" id="rp-phone">—</span></div>
+<div class="ii"><span class="ilb">Email</span><span class="ilv" id="rp-email">—</span></div>
+<div class="ii"><span class="ilb">City</span><span class="ilv" id="rp-city">—</span></div>
+<div class="ii"><span class="ilb">State</span><span class="ilv" id="rp-state">—</span></div>
+<div class="ii"><span class="ilb">Hospital</span><span class="ilv" id="rp-hosp">—</span></div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-hd"><div class="ct">Blood Requirement</div></div>
+<div class="cb">
+<div class="il">
+<div class="ii"><span class="ilb">Blood Group</span><span class="ilv"><span class="blood-tag" id="rp-bg">—</span></span></div>
+<div class="ii"><span class="ilb">Units Required</span><span class="ilv" id="rp-units">—</span></div>
+<div class="ii"><span class="ilb">Medical Condition</span><span class="ilv" id="rp-cond">—</span></div>
+<div class="ii"><span class="ilb">Urgency</span><span class="ilv" id="rp-urgency">—</span></div>
+<div class="ii"><span class="ilb">Required By</span><span class="ilv" id="rp-reqdate">—</span></div>
+<div class="ii"><span class="ilb">Doctor</span><span class="ilv" id="rp-doctor">—</span></div>
+</div>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="rreq">
+<div class="ph"><h1>My Requests</h1><p>All blood requests you have submitted</p></div>
+<div class="card">
+<div class="cf">
+<table class="tbl"><thead><tr><th>Date</th><th>Blood Group</th><th>Units</th><th>City</th><th>Urgency</th><th>Status</th></tr></thead>
+<tbody id="rv-req-body"></tbody></table>
+</div>
+</div>
+</div>
+ 
+<div class="psec" id="rnewreq">
+<div class="ph"><h1>New Blood Request</h1><p>Submit a new request — we'll match donors in your city</p></div>
+<div class="req-form-card">
+<div class="gr2">
+<div class="fg"><label>Blood Group Required *</label><select id="nr-blood"><option value="">Select</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>AB+</option><option>AB−</option></select></div>
+<div class="fg"><label>Units Required *</label><input type="number" id="nr-units" placeholder="Number of units" min="1"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>City * <span style="color:var(--blue);font-size:10px;">(Donors in this city will be notified)</span></label>
+<select id="nr-city"><option value="">Select city</option><option>Nagpur</option><option>Mumbai</option><option>Pune</option><option>Delhi</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Kolkata</option><option>Other</option></select>
+</div>
+<div class="fg"><label>Hospital Name</label><input type="text" id="nr-hosp" placeholder="Hospital or clinic name"></div>
+</div>
+<div class="gr2">
+<div class="fg"><label>Required By Date *</label><input type="date" id="nr-date"></div>
+<div class="fg"><label>Urgency *</label><select id="nr-urgency"><option value="">Select urgency</option><option>Emergency (within 24 hrs)</option><option>Urgent (within 3 days)</option><option>Normal (within a week)</option><option>Scheduled</option></select></div>
+</div>
+<div class="fg"><label>Medical Condition / Purpose *</label><input type="text" id="nr-cond" placeholder="e.g. Surgery, Thalassemia, Accident, Cancer..."></div>
+<div id="nr-err" class="err" style="margin-top:10px;"></div>
+<button class="btn btn-blue" onclick="submitNewRequest()" style="margin-top:8px;">Submit Blood Request</button>
+<div id="nr-ok" class="succ">✓ Request submitted! We are now matching donors in your city.</div>
+</div>
+<div class="alert info"><div class="aldot"></div><p>Your city selection helps us alert eligible donors in your area first. Donors from nearby cities may also be contacted if local supply is insufficient.</p></div>
+</div>
+ 
+<div class="psec" id="rcamps">
+<div class="ph"><h1>Nearby Donation Camps</h1><p>Camps in <strong id="r-camp-city">your city</strong> where you can collect blood directly</p></div>
+<div class="camp-grid" id="r-camps-list"></div>
+</div>
+ 
+</div>
+</div>
+ 
+<!-- ══════════════════════════════════════════
+ADMIN DASHBOARD
+══════════════════════════════════════════ -->
+<div class="screen" id="s-admin-dash">
+<div class="appbar">
+<div class="ableft">
+<div class="applogo"><div class="applm" style="background:var(--green);"><svg viewBox="0 0 15 18" fill="none"><path d="M7.5 1C7.5 1 1 7.5 1 12a6.5 6.5 0 0013 0C14 7.5 7.5 1 7.5 1z" fill="white"/></svg></div><div class="appln">LifeFlow <span style="color:var(--green);font-size:12px;font-weight:600;">Admin</span></div></div>
+<div class="tabs" id="atabs">
+<button class="tab on" onclick="aTab('aov',0)">Overview</button>
+<button class="tab" onclick="aTab('adreq',1)">Donor Requests <span id="a-dbadge" style="background:var(--red);color:white;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:3px;">2</span></button>
+<button class="tab" onclick="aTab('arreq',2)">Receiver Requests <span id="a-rbadge" style="background:var(--blue);color:white;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:3px;">3</span></button>
+<button class="tab" onclick="aTab('adon',3)">Donors</button>
+<button class="tab" onclick="aTab('ainv',4)">Inventory</button>
+<button class="tab" onclick="aTab('acamps',5)">Camps</button>
+<button class="tab" onclick="aTab('arpt',6)">Reports</button>
+</div>
+</div>
+<div class="abright">
+<div class="uchip"><div class="uav" style="background:var(--green-light);color:var(--green);">A</div><div class="uname">Admin</div></div>
+<button class="btn btn-ghost btn-sm" onclick="goTo('s-role')">Sign Out</button>
+</div>
+</div>
+<div class="acontent">
+ 
+<!-- OVERVIEW -->
+<div class="psec on" id="aov">
+<div class="ph"><h1>Dashboard Overview</h1><p>LifeFlow Blood Bank — Nagpur Branch · 13 March 2026</p></div>
+<div class="alert danger"><div class="aldot"></div><p><strong>AB−</strong> critically low — only 4 units remaining. Contact eligible AB− donors immediately.</p></div>
+<div class="alert warn"><div class="aldot"></div><p><strong>B−</strong> and <strong>O−</strong> are below minimum threshold. Schedule a donation drive soon.</p></div>
+<div class="srow">
+<div class="sbox sbb"><div class="slbl">Total Donors</div><div class="sval">248</div></div>
+<div class="sbox sbp"><div class="slbl">Total Receivers</div><div class="sval">87</div></div>
+<div class="sbox sbg"><div class="slbl">Units in Stock</div><div class="sval">1,340</div></div>
+<div class="sbox sbr"><div class="slbl">Pending Requests</div><div class="sval" id="aov-pend">5</div></div>
+</div>
+</div>
+ 
+<!-- DONOR REQUESTS -->
+<div class="psec" id="adreq">
+<div class="ph"><h1>Donor Requests</h1><p>Donors who have applied to donate blood</p></div>
+<div class="srow" style="grid-template-columns:repeat(3,1fr);">
+<div class="sbox sbr"><div class="slbl">Pending</div><div class="sval" id="dr-pend">2</div></div>
+<div class="sbox sbg"><div class="slbl">Accepted Today</div><div class="sval" id="dr-acc">0</div></div>
+<div class="sbox sbb"><div class="slbl">Total This Month</div><div class="sval">43</div></div>
+</div>
+<div class="card">
+<div class="card-hd"><div><div class="ct">Pending Donor Applications</div><div class="cs">Donors responding to blood request notifications</div></div></div>
+<div id="d-req-list">
+<div class="rr" id="drq1"><div class="rri"><div class="rrav">RS</div><div><div class="rrname">Rahul Sharma</div><div class="rrmeta"><span class="blood-tag" style="font-size:11px;height:20px;">AB+</span> · Nagpur · Applied 13 Mar, 09:42 AM</div></div></div><div class="rract"><button class="btn btn-green btn-sm" onclick="accDonReq('drq1','RS','Rahul Sharma','AB+','Nagpur')">Accept</button><button class="btn btn-danger-out btn-sm" onclick="decReq('drq1','donor')">Decline</button></div></div>
+<div class="rr" id="drq2"><div class="rri"><div class="rrav" style="background:var(--green-light);color:var(--green);">PK</div><div><div class="rrname">Priya Kapoor</div><div class="rrmeta"><span class="blood-tag" style="font-size:11px;height:20px;">O+</span> · Nagpur · Applied 13 Mar, 10:15 AM</div></div></div><div class="rract"><button class="btn btn-green btn-sm" onclick="accDonReq('drq2','PK','Priya Kapoor','O+','Nagpur')">Accept</button><button class="btn btn-danger-out btn-sm" onclick="decReq('drq2','donor')">Decline</button></div></div>
+</div>
+<div id="d-req-empty" class="empty-s" style="display:none;"><p>✓ No pending donor requests.</p></div>
+</div>
+<div class="card" id="d-acc-card" style="display:none;">
+<div class="card-hd"><div class="ct">Accepted Today</div></div>
+<div class="cf"><table class="tbl"><thead><tr><th>Donor</th><th>Blood Group</th><th>City</th><th>Time</th><th>Status</th></tr></thead><tbody id="d-acc-body"></tbody></table></div>
+</div>
+</div>
+ 
+<!-- RECEIVER REQUESTS -->
+<div class="psec" id="arreq">
+<div class="ph"><h1>Receiver Requests</h1><p>Blood requests submitted by patients / receivers</p></div>
+<div class="srow" style="grid-template-columns:repeat(3,1fr);">
+<div class="sbox sbb"><div class="slbl">Pending</div><div class="sval" id="rr-pend">3</div></div>
+<div class="sbox sbg"><div class="slbl">Fulfilled Today</div><div class="sval" id="rr-ful">0</div></div>
+<div class="sbox sbr"><div class="slbl">Emergency</div><div class="sval">1</div></div>
+</div>
+<div class="card">
+<div class="card-hd"><div><div class="ct">Pending Receiver Requests</div><div class="cs">City-wise blood requests from patients</div></div></div>
+<div id="rv-req-list">
+<div class="rr" id="rrq1"><div class="rri"><div class="rrav" style="background:var(--blue-light);color:var(--blue);">AK</div><div><div class="rrname">Arjun Kumar</div><div class="rrmeta"><span class="blood-tag" style="font-size:11px;height:20px;">AB−</span> · 2 units · <strong style="color:var(--red);">Emergency</strong> · <span class="badge br" style="font-size:10px;">Nagpur</span></div></div></div><div class="rract"><button class="btn btn-green btn-sm" onclick="accRecvReq('rrq1','Arjun Kumar','AB−','Nagpur')">Fulfil</button><button class="btn btn-danger-out btn-sm" onclick="decReq('rrq1','recv')">Decline</button></div></div>
+<div class="rr" id="rrq2"><div class="rri"><div class="rrav" style="background:var(--purple-light);color:var(--purple);">SM</div><div><div class="rrname">Sunita Mehta</div><div class="rrmeta"><span class="blood-tag" style="font-size:11px;height:20px;">O+</span> · 1 unit · Urgent · <span class="badge bb" style="font-size:10px;">Mumbai</span></div></div></div><div class="rract"><button class="btn btn-green btn-sm" onclick="accRecvReq('rrq2','Sunita Mehta','O+','Mumbai')">Fulfil</button><button class="btn btn-danger-out btn-sm" onclick="decReq('rrq2','recv')">Decline</button></div></div>
+<div class="rr" id="rrq3"><div class="rri"><div class="rrav" style="background:var(--amber-light);color:var(--amber);">RD</div><div><div class="rrname">Ravi Deshmukh</div><div class="rrmeta"><span class="blood-tag" style="font-size:11px;height:20px;">B+</span> · 3 units · Normal · <span class="badge bg" style="font-size:10px;">Nagpur</span></div></div></div><div class="rract"><button class="btn btn-green btn-sm" onclick="accRecvReq('rrq3','Ravi Deshmukh','B+','Nagpur')">Fulfil</button><button class="btn btn-danger-out btn-sm" onclick="decReq('rrq3','recv')">Decline</button></div></div>
+</div>
+<div id="rv-req-empty" class="empty-s" style="display:none;"><p>✓ No pending receiver requests.</p></div>
+</div>
+<div class="card" id="rv-ful-card" style="display:none;">
+<div class="card-hd"><div class="ct">Fulfilled Today</div></div>
+<div class="cf"><table class="tbl"><thead><tr><th>Receiver</th><th>Blood Group</th><th>City</th><th>Units</th><th>Time</th></tr></thead><tbody id="rv-ful-body"></tbody></table></div>
+</div>
+</div>
+ 
+<!-- DONORS LIST -->
+<div class="psec" id="adon">
+<div class="ph"><h1>Registered Donors</h1><p>All 248 registered blood donors</p></div>
+<div class="card">
+<div class="cf">
+<table class="tbl"><thead><tr><th>Name</th><th>Blood Group</th><th>Phone</th><th>City</th><th>Last Donation</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:600;color:var(--text);">Rahul Sharma</td><td><span class="blood-tag">AB+</span></td><td>98765-43210</td><td>Nagpur</td><td>12 Mar 2026</td><td><span class="badge ba">Cooldown</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Priya Kapoor</td><td><span class="blood-tag">O+</span></td><td>87654-32109</td><td>Nagpur</td><td>10 Jan 2026</td><td><span class="badge bg">Eligible</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Amit Verma</td><td><span class="blood-tag">B+</span></td><td>76543-21098</td><td>Wardha</td><td>10 Mar 2026</td><td><span class="badge ba">Cooldown</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Sunita Joshi</td><td><span class="blood-tag">A+</span></td><td>65432-10987</td><td>Nagpur</td><td>05 Dec 2025</td><td><span class="badge bg">Eligible</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Deepak Rao</td><td><span class="blood-tag">O−</span></td><td>54321-09876</td><td>Amravati</td><td>02 Jun 2025</td><td><span class="badge bg">Eligible</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Kavita Nair</td><td><span class="blood-tag">A−</span></td><td>43210-98765</td><td>Nagpur</td><td>18 Sep 2025</td><td><span class="badge bg">Eligible</span></td></tr>
+</tbody></table>
+</div>
+</div>
+</div>
+ 
+<!-- INVENTORY -->
+<div class="psec" id="ainv">
+<div class="ph"><h1>Blood Inventory</h1><p>Real-time availability across all blood groups</p></div>
+<div class="invgrid">
+<div class="invtile"><div class="invtype">A+</div><div class="invunits">320 units</div><div class="invbar"><div class="invfill" style="width:80%;background:var(--green);"></div></div><span class="badge bg">Sufficient</span></div>
+<div class="invtile"><div class="invtype">A−</div><div class="invunits">85 units</div><div class="invbar"><div class="invfill" style="width:42%;background:#F59E0B;"></div></div><span class="badge ba">Low</span></div>
+<div class="invtile"><div class="invtype">B+</div><div class="invunits">275 units</div><div class="invbar"><div class="invfill" style="width:69%;background:var(--green);"></div></div><span class="badge bg">Sufficient</span></div>
+<div class="invtile"><div class="invtype">B−</div><div class="invunits">42 units</div><div class="invbar"><div class="invfill" style="width:21%;background:#F59E0B;"></div></div><span class="badge ba">Low</span></div>
+<div class="invtile"><div class="invtype">O+</div><div class="invunits">410 units</div><div class="invbar"><div class="invfill" style="width:100%;background:var(--green);"></div></div><span class="badge bg">Sufficient</span></div>
+<div class="invtile"><div class="invtype">O−</div><div class="invunits">64 units</div><div class="invbar"><div class="invfill" style="width:32%;background:#F59E0B;"></div></div><span class="badge ba">Low</span></div>
+<div class="invtile"><div class="invtype">AB+</div><div class="invunits">140 units</div><div class="invbar"><div class="invfill" style="width:70%;background:var(--green);"></div></div><span class="badge bg">Sufficient</span></div>
+<div class="invtile"><div class="invtype">AB−</div><div class="invunits">4 units</div><div class="invbar"><div class="invfill" style="width:4%;background:var(--red);"></div></div><span class="badge br">Critical</span></div>
+</div>
+</div>
+ 
+<!-- CAMPS MANAGEMENT -->
+<div class="psec" id="acamps">
+<div class="ph"><h1>Donation Camps</h1><p>Manage blood donation camps across all cities</p></div>
+<div class="srow" style="grid-template-columns:repeat(4,1fr);">
+<div class="sbox sbb"><div class="slbl">Active Camps</div><div class="sval">6</div></div>
+<div class="sbox sbg"><div class="slbl">This Month</div><div class="sval">14</div></div>
+<div class="sbox sba"><div class="slbl">Registrations</div><div class="sval">312</div></div>
+<div class="sbox sbr"><div class="slbl">Units Collected</div><div class="sval">289</div></div>
+</div>
+<div class="camp-grid" id="admin-camps-list"></div>
+</div>
+ 
+<!-- REPORTS -->
+<div class="psec" id="arpt">
+<div id="rpt-home">
+<div class="ph"><h1>Reports</h1><p>Generate and download compliance and operational reports</p></div>
+<div class="rptgrid">
+<div class="rpttile" onclick="openRpt('rpt-avail')"><div class="rptico" style="background:var(--red-light);"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2C11 2 4 9 4 14a7 7 0 0014 0C18 9 11 2 11 2z" fill="#C41E3A"/></svg></div><div><h3>Blood Group Availability</h3><p>Current stock, critical thresholds and expiry for all 8 groups</p></div></div>
+<div class="rpttile" onclick="openRpt('rpt-donors')"><div class="rptico" style="background:var(--green-light);"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="4" fill="#157347"/><path d="M3 19c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="#157347" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><div><h3>Donor Details Report</h3><p>Complete donor list with medical history, eligibility and donation totals</p></div></div>
+<div class="rpttile" onclick="openRpt('rpt-issue')"><div class="rptico" style="background:var(--blue-light);"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="3" stroke="#1A4D8F" stroke-width="1.5" fill="none"/><path d="M7 11h8M7 7h5M7 15h3" stroke="#1A4D8F" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><h3>Blood Issue Report</h3><p>Hospital-wise blood units issued, date-wise breakdown</p></div></div>
+<div class="rpttile" onclick="openRpt('rpt-monthly')"><div class="rptico" style="background:var(--amber-light);"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="15" rx="2" stroke="#92600A" stroke-width="1.5" fill="none"/><path d="M3 9h16" stroke="#92600A" stroke-width="1.5"/><path d="M7 13h2v3H7zM10.5 11h2v5h-2zM13.5 12h2v4h-2z" fill="#92600A"/></svg></div><div><h3>Monthly Donation Report</h3><p>Month-by-month donation trends, blood group breakdown and yearly stats</p></div></div>
+</div>
+</div>
+<div class="rptview" id="rpt-avail">
+<div class="rpthd"><button class="btn btn-out btn-sm" onclick="openRpt(null)">← Back</button><div style="flex:1;"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Blood Group Availability Report</div><div style="font-size:12px;color:var(--text3);">Generated: 13 March 2026 · LifeFlow Nagpur</div></div><button class="btn btn-green btn-sm" onclick="window.print()">Print / Export</button></div>
+<div class="srow"><div class="sbox sbb"><div class="slbl">Total Stock</div><div class="sval">1,340</div></div><div class="sbox sbr"><div class="slbl">Critical Groups</div><div class="sval" style="color:var(--red);">1</div></div><div class="sbox sba"><div class="slbl">Low Groups</div><div class="sval" style="color:#F59E0B;">3</div></div><div class="sbox sbg"><div class="slbl">Sufficient</div><div class="sval" style="color:var(--green);">4</div></div></div>
+<div class="card"><div class="cf"><table class="tbl"><thead><tr><th>Blood Group</th><th>Available</th><th>Reserved</th><th>Expiry (Days)</th><th>Min Required</th><th>Status</th></tr></thead><tbody>
+<tr><td><span class="blood-tag">A+</span></td><td>320</td><td>20</td><td>28</td><td>100</td><td><span class="badge bg">Sufficient</span></td></tr>
+<tr><td><span class="blood-tag">A−</span></td><td>85</td><td>10</td><td>18</td><td>80</td><td><span class="badge ba">Low</span></td></tr>
+<tr><td><span class="blood-tag">B+</span></td><td>275</td><td>15</td><td>25</td><td>100</td><td><span class="badge bg">Sufficient</span></td></tr>
+<tr><td><span class="blood-tag">B−</span></td><td>42</td><td>5</td><td>12</td><td>60</td><td><span class="badge ba">Low</span></td></tr>
+<tr><td><span class="blood-tag">O+</span></td><td>410</td><td>30</td><td>30</td><td>120</td><td><span class="badge bg">Sufficient</span></td></tr>
+<tr><td><span class="blood-tag">O−</span></td><td>64</td><td>8</td><td>20</td><td>80</td><td><span class="badge ba">Low</span></td></tr>
+<tr><td><span class="blood-tag">AB+</span></td><td>140</td><td>12</td><td>22</td><td>60</td><td><span class="badge bg">Sufficient</span></td></tr>
+<tr><td><span class="blood-tag">AB−</span></td><td>4</td><td>2</td><td>5</td><td>40</td><td><span class="badge br">Critical</span></td></tr>
+</tbody></table></div></div>
+</div>
+<div class="rptview" id="rpt-donors">
+<div class="rpthd"><button class="btn btn-out btn-sm" onclick="openRpt(null)">← Back</button><div style="flex:1;"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Donor Details Report</div><div style="font-size:12px;color:var(--text3);">Generated: 13 March 2026 · 248 donors</div></div><button class="btn btn-green btn-sm" onclick="window.print()">Print / Export</button></div>
+<div class="srow" style="grid-template-columns:repeat(4,1fr);"><div class="sbox sbb"><div class="slbl">Total</div><div class="sval">248</div></div><div class="sbox sbg"><div class="slbl">Eligible</div><div class="sval" style="color:var(--green);">186</div></div><div class="sbox sba"><div class="slbl">Cooldown</div><div class="sval" style="color:#F59E0B;">62</div></div><div class="sbox sbr"><div class="slbl">New This Month</div><div class="sval">12</div></div></div>
+<div class="card"><div class="cf"><table class="tbl"><thead><tr><th>Name</th><th>Blood Group</th><th>City</th><th>Total Donations</th><th>Last Donation</th><th>Disease</th><th>Status</th></tr></thead><tbody>
+<tr><td style="font-weight:600;color:var(--text);">Rahul Sharma</td><td><span class="blood-tag">AB+</span></td><td>Nagpur</td><td>3</td><td>12 Mar 2026</td><td>None</td><td><span class="badge ba">Cooldown</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Priya Kapoor</td><td><span class="blood-tag">O+</span></td><td>Nagpur</td><td>7</td><td>10 Jan 2026</td><td>None</td><td><span class="badge bg">Eligible</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Amit Verma</td><td><span class="blood-tag">B+</span></td><td>Wardha</td><td>5</td><td>10 Mar 2026</td><td>None</td><td><span class="badge ba">Cooldown</span></td></tr>
+<tr><td style="font-weight:600;color:var(--text);">Sunita Joshi</td><td><span class="blood-tag">A+</span></td><td>Nagpur</td><td>4</td><td>05 Dec 2025</td><td>None</td><td><span class="badge bg">Eligible</span></td></tr>
+</tbody></table></div></div>
+</div>
+<div class="rptview" id="rpt-issue">
+<div class="rpthd"><button class="btn btn-out btn-sm" onclick="openRpt(null)">← Back</button><div style="flex:1;"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Blood Issue Report</div><div style="font-size:12px;color:var(--text3);">Generated: 13 March 2026 · March 2026</div></div><button class="btn btn-green btn-sm" onclick="window.print()">Print / Export</button></div>
+<div class="srow" style="grid-template-columns:repeat(3,1fr);"><div class="sbox sbb"><div class="slbl">Total Issued</div><div class="sval">67</div></div><div class="sbox sbg"><div class="slbl">Hospitals</div><div class="sval">8</div></div><div class="sbox sbr"><div class="slbl">Emergency</div><div class="sval" style="color:var(--red);">12</div></div></div>
+<div class="card"><div class="cf"><table class="tbl"><thead><tr><th>Date</th><th>Hospital</th><th>City</th><th>Patient ID</th><th>Blood Group</th><th>Units</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>12 Mar</td><td>AIIMS Nagpur</td><td>Nagpur</td><td>PT-4821</td><td><span class="blood-tag">O+</span></td><td>2</td><td>Surgery</td></tr>
+<tr><td>11 Mar</td><td>Orange City Hospital</td><td>Nagpur</td><td>PT-3392</td><td><span class="blood-tag">A+</span></td><td>1</td><td>Anemia</td></tr>
+<tr><td>11 Mar</td><td>KEM Hospital</td><td>Mumbai</td><td>PT-5541</td><td><span class="blood-tag">B+</span></td><td>3</td><td>Accident</td></tr>
+<tr><td>10 Mar</td><td>Wockhardt</td><td>Nagpur</td><td>PT-2219</td><td><span class="blood-tag">AB+</span></td><td>1</td><td>Thalassemia</td></tr>
+<tr><td>09 Mar</td><td>Alexis Hospital</td><td>Nagpur</td><td>PT-6670</td><td><span class="blood-tag">O−</span></td><td>2</td><td>Childbirth</td></tr>
+</tbody></table></div></div>
+</div>
+<div class="rptview" id="rpt-monthly">
+<div class="rpthd"><button class="btn btn-out btn-sm" onclick="openRpt(null)">← Back</button><div style="flex:1;"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Monthly Donation Report</div><div style="font-size:12px;color:var(--text3);">Generated: 13 March 2026 · FY 2025–26</div></div><button class="btn btn-green btn-sm" onclick="window.print()">Print / Export</button></div>
+<div class="srow"><div class="sbox sbb"><div class="slbl">March 2026</div><div class="sval">43</div></div><div class="sbox sbg"><div class="slbl">Feb 2026</div><div class="sval">51</div></div><div class="sbox sba"><div class="slbl">YTD Total</div><div class="sval">487</div></div><div class="sbox sbr"><div class="slbl">Avg Monthly</div><div class="sval">45</div></div></div>
+<div class="card"><div class="cf"><table class="tbl"><thead><tr><th>Month</th><th>A+</th><th>A−</th><th>B+</th><th>B−</th><th>O+</th><th>O−</th><th>AB+</th><th>AB−</th><th><strong>Total</strong></th></tr></thead><tbody>
+<tr><td style="font-weight:600;">Mar 2026</td><td>8</td><td>3</td><td>7</td><td>2</td><td>12</td><td>4</td><td>5</td><td>2</td><td style="font-weight:700;color:var(--red);">43</td></tr>
+<tr><td style="font-weight:600;">Feb 2026</td><td>10</td><td>4</td><td>9</td><td>3</td><td>14</td><td>5</td><td>4</td><td>2</td><td style="font-weight:700;color:var(--red);">51</td></tr>
+<tr><td style="font-weight:600;">Jan 2026</td><td>9</td><td>3</td><td>8</td><td>2</td><td>13</td><td>4</td><td>5</td><td>1</td><td style="font-weight:700;color:var(--red);">45</td></tr>
+<tr><td style="font-weight:600;">Dec 2025</td><td>11</td><td>4</td><td>10</td><td>3</td><td>15</td><td>5</td><td>6</td><td>2</td><td style="font-weight:700;color:var(--red);">56</td></tr>
+<tr><td style="font-weight:600;">Nov 2025</td><td>8</td><td>3</td><td>7</td><td>2</td><td>11</td><td>4</td><td>4</td><td>1</td><td style="font-weight:700;color:var(--red);">40</td></tr>
+</tbody></table></div></div>
+</div>
+</div>
+ 
+</div>
+</div>
+ 
+<script>
+// ── DATA ──
+var DONOR={};var RECV={};
+var dPend=2,dAcc=0,rvPend=3,rvFul=0;
+ 
+var CAMPS=[
+{id:1,org:'Red Cross Blood Drive',city:'Nagpur',addr:'Civil Lines Community Hall, Nagpur',date:'15 Mar 2026',time:'9:00 AM – 4:00 PM',bg:['All groups'],slots:120,reg:87,contact:'0712-2561234'},
+{id:2,org:'Rotary Club Camp',city:'Nagpur',addr:'Rotary Bhavan, Dharampeth, Nagpur',date:'18 Mar 2026',time:'10:00 AM – 3:00 PM',bg:['O−','AB−','B−'],slots:80,reg:42,contact:'0712-2244567'},
+{id:3,org:'NMC Blood Donation Drive',city:'Nagpur',addr:'Nagpur Municipal Corporation HQ',date:'22 Mar 2026',time:'8:00 AM – 2:00 PM',bg:['All groups'],slots:200,reg:156,contact:'0712-2565000'},
+{id:4,org:'Mumbai Blood Bank Camp',city:'Mumbai',addr:'Dadar Tilak Bridge Community Centre',date:'16 Mar 2026',time:'9:00 AM – 5:00 PM',bg:['All groups'],slots:150,reg:110,contact:'022-24129999'},
+{id:5,org:'Pune City Donation Drive',city:'Pune',addr:'Shivajinagar Sports Ground, Pune',date:'20 Mar 2026',time:'9:00 AM – 3:00 PM',bg:['A−','O−'],slots:100,reg:67,contact:'020-25533333'},
+{id:6,org:'Delhi AIIMS Camp',city:'Delhi',addr:'AIIMS Campus, Ansari Nagar, Delhi',date:'17 Mar 2026',time:'7:00 AM – 6:00 PM',bg:['All groups'],slots:300,reg:243,contact:'011-26588500'},
+];
+ 
+function buildCampCard(c,showReg){
+var pct=Math.round(c.reg/c.slots*100);
+var bgtext=c.bg.join(', ');
+return '<div class="camp-card">'+
+'<div class="camp-top"><div><div class="camp-org">'+c.org+'</div><span class="badge bb" style="margin-top:4px;font-size:11px;">'+c.city+'</span></div><span class="badge bg" style="font-size:11px;">'+pct+'% full</span></div>'+
+'<div class="camp-body">'+
+'<div class="camp-row"><svg class="camp-ico" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 1v3M11 1v3M1 7h14" stroke="currentColor" stroke-width="1.2"/></svg>'+c.date+' &nbsp;·&nbsp; '+c.time+'</div>'+
+'<div class="camp-row"><svg class="camp-ico" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6c0 3.5 4.5 8.5 4.5 8.5S12.5 9.5 12.5 6C12.5 3.5 10.5 1.5 8 1.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="8" cy="6" r="1.5" fill="currentColor"/></svg>'+c.addr+'</div>'+
+'<div class="camp-row"><svg class="camp-ico" viewBox="0 0 16 16" fill="none"><path d="M8 4C8 4 4 8 4 11a4 4 0 008 0C12 8 8 4 8 4z" fill="#C41E3A"/></svg><span style="color:var(--text3);">Blood groups: </span>&nbsp;<strong>'+bgtext+'</strong></div>'+
+'<div class="camp-row"><svg class="camp-ico" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'+c.reg+' / '+c.slots+' slots filled · Contact: '+c.contact+'</div>'+
+'</div>'+
+'<div class="camp-action">'+
+(showReg?'<button class="btn btn-red btn-sm">Register for Camp</button>':'<button class="btn btn-green btn-sm">Edit</button><button class="btn btn-ghost btn-sm">View Registrations</button>')+
+'</div>'+
+'</div>';
+}
+ 
+function filterCamps(){
+var city=document.getElementById('pub-city-filter').value;
+var bg=document.getElementById('pub-bg-filter').value;
+var filtered=CAMPS.filter(c=>{
+if(city&&c.city!==city)return false;
+if(bg&&!c.bg.includes('All groups')&&!c.bg.includes(bg))return false;
+return true;
+});
+var el=document.getElementById('pub-camps-list');
+el.innerHTML=filtered.length?filtered.map(c=>buildCampCard(c,true)).join(''):'<div class="empty-s" style="grid-column:1/-1;"><p>No camps found for the selected filters.</p></div>';
+}
+ 
+function loadCamps(containerId,city,showReg){
+var filtered=city?CAMPS.filter(c=>c.city===city||c.city==='All'):CAMPS;
+if(city&&filtered.length===0)filtered=CAMPS.filter(c=>c.city===city);
+document.getElementById(containerId).innerHTML=filtered.map(c=>buildCampCard(c,showReg)).join('');
+}
+ 
+// ── NAVIGATION ──
+function goTo(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+window.scrollTo(0,0);
+if(id==='s-camp-public')filterCamps();
+}
+function dTab(id,i){
+['dh','dprof','dhist','dcamps'].forEach(s=>document.getElementById(s).classList.remove('on'));
+document.querySelectorAll('#dtabs .tab').forEach(b=>b.classList.remove('on'));
+document.getElementById(id).classList.add('on');
+document.querySelectorAll('#dtabs .tab')[i].classList.add('on');
+if(id==='dcamps')loadCamps('d-camps-list',DONOR.city||'',true);
+}
+function rTab(id,i){
+['rh','rrprof','rreq','rnewreq','rcamps'].forEach(s=>document.getElementById(s).classList.remove('on'));
+document.querySelectorAll('#rtabs .tab').forEach(b=>b.classList.remove('on'));
+document.getElementById(id).classList.add('on');
+document.querySelectorAll('#rtabs .tab')[i].classList.add('on');
+if(id==='rcamps')loadCamps('r-camps-list',RECV.city||'',true);
+}
+function aTab(id,i){
+['aov','adreq','arreq','adon','ainv','acamps','arpt'].forEach(s=>document.getElementById(s).classList.remove('on'));
+document.querySelectorAll('#atabs .tab').forEach(b=>b.classList.remove('on'));
+document.getElementById(id).classList.add('on');
+document.querySelectorAll('#atabs .tab')[i].classList.add('on');
+if(id==='arpt')openRpt(null);
+if(id==='acamps')loadCamps('admin-camps-list','',false);
+}
+function openRpt(id){
+document.querySelectorAll('.rptview').forEach(r=>r.classList.remove('on'));
+document.getElementById('rpt-home').style.display=id?'none':'block';
+if(id)document.getElementById(id).classList.add('on');
+}
+ 
+// ── AUTH ──
+function donorLogin(){
+var e=document.getElementById('dl-email').value.trim(),p=document.getElementById('dl-pass').value;
+if(!e||!p){document.getElementById('dl-err').style.display='block';return;}
+document.getElementById('dl-err').style.display='none';
+if(!DONOR.firstName){DONOR={firstName:e.split('@')[0],lastName:'',email:e,phone:'—',city:'Nagpur',state:'—',addr:'—',dob:'—',gender:'—',blood:'—',weight:'—',disease:'—',meds:'—',allergy:'—',lastdon:'—',notes:'—',aadhar:'—',emerg:'—',donations:0};}
+fillDonorDash();goTo('s-donor-dash');
+}
+function recvLogin(){
+var e=document.getElementById('rl-email').value.trim(),p=document.getElementById('rl-pass').value;
+if(!e||!p){document.getElementById('rl-err').style.display='block';return;}
+document.getElementById('rl-err').style.display='none';
+if(!RECV.firstName){RECV={firstName:e.split('@')[0],lastName:'',email:e,phone:'—',city:'Nagpur',state:'—',hosp:'—',blood:'—',units:'—',condition:'—',urgency:'—',reqdate:'—',doctor:'—',pass:''};}
+fillRecvDash();goTo('s-recv-dash');
+}
+function adminLogin(){
+var id=document.getElementById('al-id').value.trim(),p=document.getElementById('al-pass').value;
+if(!id||!p){document.getElementById('al-err').style.display='block';return;}
+document.getElementById('al-err').style.display='none';goTo('s-admin-dash');
+}
+ 
+function registerDonor(){
+var fn=document.getElementById('r-fname').value.trim(),ln=document.getElementById('r-lname').value.trim();
+var bg=document.getElementById('r-blood').value,ph=document.getElementById('r-phone').value.trim();
+var em=document.getElementById('r-email').value.trim(),pw=document.getElementById('r-pass').value,cpw=document.getElementById('r-cpass').value;
+var city=document.getElementById('r-city').value;
+var err=document.getElementById('reg-err');
+if(!fn||!ln){err.textContent='Please enter your full name.';err.style.display='block';return;}
+if(!bg){err.textContent='Please select your blood group.';err.style.display='block';return;}
+if(!city){err.textContent='Please select your city.';err.style.display='block';return;}
+if(!ph||!em){err.textContent='Phone and email are required.';err.style.display='block';return;}
+if(!pw||pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
+if(pw!==cpw){err.textContent='Passwords do not match.';err.style.display='block';return;}
+err.style.display='none';
+DONOR={
+firstName:fn,lastName:ln,
+dob:document.getElementById('r-dob').value||'—',
+gender:document.getElementById('r-gender').value||'—',
+phone:ph,email:em,
+city:city,state:document.getElementById('r-state').value||'—',
+addr:document.getElementById('r-addr').value.trim()||'—',
+blood:bg,weight:document.getElementById('r-weight').value?document.getElementById('r-weight').value+' kg':'—',
+disease:document.getElementById('r-disease').value||'None',
+lastdon:document.getElementById('r-lastdon').value||'First-time donor',
+meds:document.getElementById('r-meds').value.trim()||'—',
+allergy:document.getElementById('r-allergy').value.trim()||'—',
+notes:document.getElementById('r-notes').value.trim()||'—',
+aadhar:document.getElementById('r-aadhar').value.trim()||'—',
+emerg:document.getElementById('r-emerg').value.trim()||'—',
+donations:0
+};
+var ok=document.getElementById('reg-ok');ok.style.display='block';
+setTimeout(()=>{ok.style.display='none';fillDonorDash();goTo('s-donor-dash');},1800);
+}
+ 
+function registerRecv(){
+var fn=document.getElementById('rv-fname').value.trim(),ln=document.getElementById('rv-lname').value.trim();
+var bg=document.getElementById('rv-blood').value,city=document.getElementById('rv-city').value;
+var ph=document.getElementById('rv-phone').value.trim(),em=document.getElementById('rv-email').value.trim();
+var pw=document.getElementById('rv-pass').value,cpw=document.getElementById('rv-cpass').value;
+var units=document.getElementById('rv-units').value,urgency=document.getElementById('rv-urgency').value;
+var cond=document.getElementById('rv-condition').value.trim();
+var err=document.getElementById('rv-err');
+if(!fn||!ln){err.textContent='Please enter your full name.';err.style.display='block';return;}
+if(!city){err.textContent='City is required to find nearby donors.';err.style.display='block';return;}
+if(!bg){err.textContent='Please select required blood group.';err.style.display='block';return;}
+if(!units||!urgency||!cond){err.textContent='Blood requirement details are required.';err.style.display='block';return;}
+if(!ph||!em){err.textContent='Phone and email are required.';err.style.display='block';return;}
+if(!pw||pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
+if(pw!==cpw){err.textContent='Passwords do not match.';err.style.display='block';return;}
+err.style.display='none';
+RECV={
+firstName:fn,lastName:ln,
+phone:ph,email:em,
+city:city,state:document.getElementById('rv-state').value||'—',
+hosp:document.getElementById('rv-hospital').value.trim()||'—',
+blood:bg,units:units+' units',
+condition:cond,urgency:urgency,
+reqdate:document.getElementById('rv-reqdate').value||'—',
+doctor:document.getElementById('rv-doctor').value.trim()||'—'
+};
+var ok=document.getElementById('rv-ok');ok.style.display='block';
+setTimeout(()=>{ok.style.display='none';fillRecvDash();goTo('s-recv-dash');},1800);
+}
+ 
+function fillDonorDash(){
+var full=(DONOR.firstName+' '+DONOR.lastName).trim();
+var ini=((DONOR.firstName[0]||'')+(DONOR.lastName?DONOR.lastName[0]:'')).toUpperCase()||'?';
+document.getElementById('d-av').textContent=ini;
+document.getElementById('d-uname').textContent=DONOR.firstName;
+document.getElementById('n-bg').textContent=DONOR.blood||'—';
+document.getElementById('n-bg2').textContent=DONOR.blood||'—';
+document.getElementById('n-city').textContent=DONOR.city||'Nagpur';
+document.getElementById('d-sc').textContent=DONOR.donations;
+document.getElementById('d-sbg').textContent=DONOR.blood||'—';
+document.getElementById('d-slives').textContent=DONOR.donations*3;
+document.getElementById('d-snext').textContent=DONOR.donations>0?'Jun 2026':'Eligible now';
+document.getElementById('ds-name').textContent=full;
+document.getElementById('ds-bg').textContent=DONOR.blood||'—';
+document.getElementById('ds-city').textContent=DONOR.city;
+document.getElementById('ds-phone').textContent=DONOR.phone;
+document.getElementById('pp-name').textContent=full;
+document.getElementById('pp-dob').textContent=DONOR.dob;
+document.getElementById('pp-gender').textContent=DONOR.gender;
+document.getElementById('pp-phone').textContent=DONOR.phone;
+document.getElementById('pp-email').textContent=DONOR.email;
+document.getElementById('pp-loc').textContent=[DONOR.city,DONOR.state].filter(x=>x&&x!=='—').join(', ')||'—';
+document.getElementById('pp-addr').textContent=DONOR.addr;
+document.getElementById('pp-bg').textContent=DONOR.blood||'—';
+document.getElementById('pp-weight').textContent=DONOR.weight;
+document.getElementById('pp-disease').textContent=DONOR.disease;
+document.getElementById('pp-meds').textContent=DONOR.meds;
+document.getElementById('pp-allergy').textContent=DONOR.allergy;
+document.getElementById('pp-lastdon').textContent=DONOR.lastdon;
+document.getElementById('pp-notes').textContent=DONOR.notes;
+document.getElementById('pp-aadhar').textContent=DONOR.aadhar;
+document.getElementById('pp-emerg').textContent=DONOR.emerg;
+document.getElementById('d-camp-city').textContent=DONOR.city;
+document.getElementById('d-camp-city2').textContent=DONOR.city;
+}
+ 
+function fillRecvDash(){
+var full=(RECV.firstName+' '+RECV.lastName).trim();
+var ini=((RECV.firstName[0]||'')+(RECV.lastName?RECV.lastName[0]:'')).toUpperCase()||'?';
+document.getElementById('r-av').textContent=ini;
+document.getElementById('r-uname').textContent=RECV.firstName;
+document.getElementById('rv-sreq').textContent='1';
+document.getElementById('rv-sbg').textContent=RECV.blood||'—';
+document.getElementById('rv-scity').textContent=RECV.city||'—';
+document.getElementById('rv-sstatus').textContent='Pending';
+document.getElementById('rv-city-info').textContent=RECV.city||'your city';
+document.getElementById('rv-rname').textContent=full;
+document.getElementById('rv-rbg').textContent=RECV.blood||'—';
+document.getElementById('rv-runits').textContent=RECV.units||'—';
+document.getElementById('rv-rcity').textContent=RECV.city||'—';
+document.getElementById('rv-rhosp').textContent=RECV.hosp||'—';
+document.getElementById('rv-rdate').textContent=RECV.reqdate||'—';
+document.getElementById('rv-rurgency').textContent=RECV.urgency||'—';
+document.getElementById('rv-rcond').textContent=RECV.condition||'—';
+document.getElementById('rp-name').textContent=full;
+document.getElementById('rp-phone').textContent=RECV.phone||'—';
+document.getElementById('rp-email').textContent=RECV.email||'—';
+document.getElementById('rp-city').textContent=RECV.city||'—';
+document.getElementById('rp-state').textContent=RECV.state||'—';
+document.getElementById('rp-hosp').textContent=RECV.hosp||'—';
+document.getElementById('rp-bg').textContent=RECV.blood||'—';
+document.getElementById('rp-units').textContent=RECV.units||'—';
+document.getElementById('rp-cond').textContent=RECV.condition||'—';
+document.getElementById('rp-urgency').textContent=RECV.urgency||'—';
+document.getElementById('rp-reqdate').textContent=RECV.reqdate||'—';
+document.getElementById('rp-doctor').textContent=RECV.doctor||'—';
+document.getElementById('r-camp-city').textContent=RECV.city||'your city';
+var now=new Date();var d=now.getDate()+' Mar 2026';
+document.getElementById('rv-req-body').innerHTML='<tr><td>'+d+'</td><td><span class="blood-tag">'+RECV.blood+'</span></td><td>'+RECV.units+'</td><td>'+RECV.city+'</td><td>'+RECV.urgency+'</td><td><span class="badge bb">Pending</span></td></tr>';
+}
+ 
+function applyDonate(){
+document.getElementById('n-btns').style.display='none';
+document.getElementById('n-ok').style.display='block';
+}
+ 
+function submitNewRequest(){
+var bg=document.getElementById('nr-blood').value,city=document.getElementById('nr-city').value;
+var units=document.getElementById('nr-units').value,urgency=document.getElementById('nr-urgency').value;
+var cond=document.getElementById('nr-cond').value.trim();
+var err=document.getElementById('nr-err');
+if(!bg||!city||!units||!urgency||!cond){err.textContent='Please fill all required fields.';err.style.display='block';return;}
+err.style.display='none';
+var ok=document.getElementById('nr-ok');ok.style.display='block';
+setTimeout(()=>{ok.style.display='none';},3000);
+}
+ 
+// ── ADMIN ACTIONS ──
+function accDonReq(id,ini,name,bg,city){
+var el=document.getElementById(id);if(!el)return;
+el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.style.display='none',280);
+dPend=Math.max(0,dPend-1);dAcc++;
+document.getElementById('dr-pend').textContent=dPend;
+document.getElementById('dr-acc').textContent=dAcc;
+document.getElementById('a-dbadge').textContent=dPend;document.getElementById('a-dbadge').style.display=dPend>0?'inline':'none';
+document.getElementById('aov-pend').textContent=dPend+rvPend;
+document.getElementById('d-acc-card').style.display='block';
+var now=new Date(),t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+var tr=document.createElement('tr');
+tr.innerHTML='<td style="font-weight:600;color:var(--text);">'+name+'</td><td><span class="blood-tag">'+bg+'</span></td><td>'+city+'</td><td>'+t+'</td><td><span class="badge bg">Accepted</span></td>';
+document.getElementById('d-acc-body').appendChild(tr);
+if(dPend===0)document.getElementById('d-req-empty').style.display='block';
+}
+ 
+function accRecvReq(id,name,bg,city){
+var el=document.getElementById(id);if(!el)return;
+el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.style.display='none',280);
+rvPend=Math.max(0,rvPend-1);rvFul++;
+document.getElementById('rr-pend').textContent=rvPend;
+document.getElementById('rr-ful').textContent=rvFul;
+document.getElementById('a-rbadge').textContent=rvPend;document.getElementById('a-rbadge').style.display=rvPend>0?'inline':'none';
+document.getElementById('aov-pend').textContent=dPend+rvPend;
+document.getElementById('rv-ful-card').style.display='block';
+var now=new Date(),t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+var tr=document.createElement('tr');
+tr.innerHTML='<td style="font-weight:600;color:var(--text);">'+name+'</td><td><span class="blood-tag">'+bg+'</span></td><td>'+city+'</td><td>—</td><td>'+t+'</td>';
+document.getElementById('rv-ful-body').appendChild(tr);
+if(rvPend===0)document.getElementById('rv-req-empty').style.display='block';
+}
+ 
+function decReq(id,type){
+var el=document.getElementById(id);if(!el)return;
+el.style.opacity='0';setTimeout(()=>el.style.display='none',280);
+if(type==='donor'){dPend=Math.max(0,dPend-1);document.getElementById('dr-pend').textContent=dPend;document.getElementById('a-dbadge').textContent=dPend;document.getElementById('a-dbadge').style.display=dPend>0?'inline':'none';if(dPend===0)document.getElementById('d-req-empty').style.display='block';}
+else{rvPend=Math.max(0,rvPend-1);document.getElementById('rr-pend').textContent=rvPend;document.getElementById('a-rbadge').textContent=rvPend;document.getElementById('a-rbadge').style.display=rvPend>0?'inline':'none';if(rvPend===0)document.getElementById('rv-req-empty').style.display='block';}
+document.getElementById('aov-pend').textContent=dPend+rvPend;
+}
+ 
+// Init public camps
+filterCamps();
+</script>
+</body>
+</html>
+ 
